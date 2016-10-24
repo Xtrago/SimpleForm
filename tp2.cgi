@@ -30,24 +30,23 @@ if (!$query->param) {
 	$description = $query->param('description');
 	$price = $query->param('price');
 	my $fileProductos = "/tmp/productos";
-# Comprobación mediante expresión regular
-if($name =~ m/^..-.+/i){   # para estar de acuerdo con el enunciado primitivo
+	# Comprobación mediante expresión regular
+	if($name =~ m/^..-.+/i){   # para estar de acuerdo con el enunciado primitivo
 		my $filename = '/tmp/categorias';
+		#Abrimos archivo categorias
 		open(my $fh, '<:encoding(UTF-8)', $filename)	
-	  		or die "Could not open file '$filename' $!";
-	 
+	  		or die "Could not open file '$filename' $!";	 
 		while (<$fh>) {
                   chomp;
+		  # Si coincide con la categoria se escribe en productos
                   if(substr($name,0,2) eq $_) {
-				    unless(open FILE, '>'.$fileProductos) {
-				    # Generar error
-				    die "\nNo se puede crear $fileProductos\n";
-				}
-				print FILE "$name $description $price";           		
-                return;
+				open F, ">> /tmp/productos" or die "Problema $!";
+				print F "$name $description $price\n";  
+				close F;
+				return;  
+			}                
 		    }	 
-        }
+        	}
 	}
-	print $query->h3("NO coincide la categoria");
-}
+print $query->h3("NO coincide la categoria");
 print $query->end_html;
