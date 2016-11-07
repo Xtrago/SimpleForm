@@ -8,7 +8,7 @@
 use CGI;
 $query = new CGI;
 
-print $query->header;
+print $query->header(-charset => 'utf-8');
 print $query->start_html('Formulario Básico');
 
 if (!$query->param) {
@@ -31,6 +31,7 @@ if (!$query->param) {
 	$price = $query->param('price');
 	my $fileProductos = "/tmp/productos";
 	# Comprobación mediante expresión regular
+        $message="";
 	if($name =~ m/^..-.+/i){   # para estar de acuerdo con el enunciado primitivo
 		my $filename = '/tmp/categorias';
 		#Abrimos archivo categorias
@@ -41,12 +42,20 @@ if (!$query->param) {
 		  # Si coincide con la categoria se escribe en productos
                   if(substr($name,0,2) eq $_) {
 				open F, ">> /tmp/productos" or die "Problema $!";
+                                 # maybe selecting a field separator ¿?
 				print F "$name $description $price\n";  
 				close F;
-				return;  
-			}                
-		    }	 
-        	}
-	}
-print $query->h3("NO coincide la categoria");
+                                $message="Saved";
+                                last;
+		  }                
+	        }
+                if($message eq "") {
+                  $message="Category not correct";
+                }
+          }
+          else {
+             $message="Category pattern not matchs";
+          }
+}
+print $query->h3($message);
 print $query->end_html;
